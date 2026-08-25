@@ -36,6 +36,14 @@ public class EmojiParser : InlineParser
             return false;
         }
 
+        // An emoji candidate must not end with two '*'.
+        var lastChar = slice.PeekChar(slice.Length - 1);
+        var secondLastChar = slice.PeekChar(slice.Length - 2);
+        if (lastChar == '*' && secondLastChar == '*')
+        {
+            return false;
+        }
+
         // Try to match an emoji shortcode or smiley
         if (!_emojiMapping.PrefixTree.TryMatchLongest(slice.Text.AsSpan(slice.Start, slice.Length), out KeyValuePair<string, string> match))
         {
