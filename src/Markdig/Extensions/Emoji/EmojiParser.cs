@@ -48,7 +48,7 @@ public class EmojiParser : InlineParser
         {
             // Only look at the following char if the emoji ends with a '*', otherwise it is not needed.
             var followingChar = slice.PeekChar(match.Key.Length);
-            if (lastEmojiChar == '*' && followingChar == '*')
+            if (followingChar == '*')
             {
                 // Emoji false positive
                 return false;
