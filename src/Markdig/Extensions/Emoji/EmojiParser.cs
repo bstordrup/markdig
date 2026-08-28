@@ -36,27 +36,23 @@ public class EmojiParser : InlineParser
             return false;
         }
 
-        //// An emoji candidate must not end with two '*'.
-        //var lastChar = slice.PeekChar(slice.Length - 1);
-        //var secondLastChar = slice.PeekChar(slice.Length - 2);
-        //if (lastChar == '*' && secondLastChar == '*')
-        //{
-        //    return false;
-        //}
-
         // Try to match an emoji shortcode or smiley
         if (!_emojiMapping.PrefixTree.TryMatchLongest(slice.Text.AsSpan(slice.Start, slice.Length), out KeyValuePair<string, string> match))
         {
             return false;
         }
 
-        // An emoji candidate must not end with two '*'.
-        var lastChar = match.Key[match.Key.Length - 1]; // slice.PeekChar(slice.Length - 1);
-        var secondLastChar = match.Key[match.Key.Length - 2]; // slice.PeekChar(slice.Length - 2);
-        if (lastChar == '*' && secondLastChar == '*')
+        // If the found emoji ends with a ´*´, the following char must not be a '*'.
+        var lastEmojiChar = match.Key[match.Key.Length - 1];
+        if (lastEmojiChar == '*')
         {
-            // Emoji false positive
-            return false;
+            // Only look at the following char if the emoji ends with a '*', otherwise it is not needed.
+            var followingChar = slice.PeekChar(match.Key.Length);
+            if (lastEmojiChar == '*' && followingChar == '*')
+            {
+                // Emoji false positive
+                return false;
+            }
         }
 
         // Push the EmojiInline
